@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gatsby Vocab Quiz</title>
+    <link rel="icon" href="gatsby.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .button {
+            padding: 10px 20px;
+            margin: 10px auto;
+            display: block;
+            border: none;
+            border-radius: 5px;
+            background-color: #1e88e5;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #1565c0;
+        }
+
+        .image {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border: 2px solid #1e88e5;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .results {
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .answers {
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .answer {
+            padding: 10px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #424242;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex: 1 1 calc(45% - 20px);
+            max-width: calc(45% - 20px);
+            box-sizing: border-box;
+        }
+
+        .answer:hover {
+            background-color: #616161;
+        }
+
+        .correct {
+            background-color: #43a047 !important;
+        }
+
+        .incorrect {
+            background-color: #e53935 !important;
+        }
+
+        .question-number {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .answer {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+
+            .button {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Vocab Quiz!</h1>
+        <p class="subtitle">For Assignment "Where's Waldo? Vocab Scene 1 (Gatsby Chapters 1-3)" by Boston T.</p>
+        <button id="startQuiz" class="button">Start Quiz?</button>
+        
+        <div id="quizContainer" style="display: none;">
+            <p id="questionNumber" class="question-number"></p>
+            <img id="quizImage" class="image" src="" alt="Vocab Image">
+            <div id="answers" class="answers"></div>
+        </div>
+
+        <div id="results" style="display: none;" class="results">
+            <h2>Your Total Score</h2>
+            <p id="score" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;"></p>
+            <button id="restartQuiz" class="button">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { image: 'anemic.jpg', correct: 'Anemic', incorrect: ['Robust', 'Healthy', 'Energetic'] },
+            { image: 'Ascertain.jpg', correct: 'Ascertain', incorrect: ['Guess', 'Neglect', 'Overlook'] },
+            { image: 'compulsion.jpg', correct: 'Compulsion', incorrect: ['Freedom', 'Option', 'Choice'] },
+            { image: 'Corpulent.jpg', correct: 'Corpulent', incorrect: ['Skeletal', 'Emaciated', 'Lithe'] },
+            { image: 'defer.jpg', correct: 'Defer', incorrect: ['Demand', 'Hasten', 'Reject'] },
+            { image: 'Dissension.jpg', correct: 'Dissension', incorrect: ['Agreement', 'Harmony', 'Unity'] },
+            { image: 'Erroneous.jpg', correct: 'Erroneous', incorrect: ['Correct', 'Accurate', 'True'] },
+            { image: 'feign.jpg', correct: 'Feign', incorrect: ['Reveal', 'Show', 'Expose'] },
+            { image: 'fervent.jpg', correct: 'Fervent', incorrect: ['Indifferent', 'Apathetic', 'Cold'] },
+            { image: 'implore.jpg', correct: 'Implore', incorrect: ['Refuse', 'Command', 'Deny'] },
+            { image: 'incessant.jpg', correct: 'Incessant', incorrect: ['Occasional', 'Interrupted', 'Irregular'] },
+            { image: 'indignant.jpg', correct: 'Indignant', incorrect: ['Content', 'Satisfied', 'Pleased'] },
+            { image: 'infinitesimal.jpg', correct: 'Infinitesimal', incorrect: ['Gigantic', 'Huge', 'Colossal'] },
+            { image: 'libel.jpg', correct: 'Libel', incorrect: ['Compliment', 'Praise', 'Approval'] },
+            { image: 'permeate.jpg', correct: 'Permeate', incorrect: ['Repel', 'Block', 'Seal'] },
+            { image: 'solemn.jpg', correct: 'Solemn', incorrect: ['Cheerful', 'Playful', 'Joking'] },
+            { image: 'Strident.jpg', correct: 'Strident', incorrect: ['Soft', 'Mellow', 'Hushed'] },
+            { image: 'supercilious.jpg', correct: 'Supercilious', incorrect: ['Humble', 'Modest', 'Meek'] },
+            { image: 'vacuous.jpg', correct: 'Vacuous', incorrect: ['Astute', 'Insightful', 'Intelligent'] },
+            { image: 'Wistfully.jpg', correct: 'Wistfully', incorrect: ['Contentedly', 'Happily', 'Cheerfully'] }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        const startQuizButton = document.getElementById('startQuiz');
+        const quizContainer = document.getElementById('quizContainer');
+        const quizImage = document.getElementById('quizImage');
+        const answersContainer = document.getElementById('answers');
+        const resultsContainer = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const questionNumberElement = document.getElementById('questionNumber');
+        const restartQuizButton = document.getElementById('restartQuiz');
+        const subtitle = document.querySelector('.subtitle');
+
+        function startQuiz() {
+            startQuizButton.style.display = 'none';
+            subtitle.style.display = 'none';
+            quizContainer.style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            questionNumberElement.textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
+            quizImage.src = `images/${question.image}`;
+            answersContainer.innerHTML = '';
+            const options = shuffle([question.correct, ...question.incorrect]);
+
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('answer');
+                button.onclick = () => {
+                    checkAnswer(option);
+                    quizContainer.style.animation = 'fadeOut 0.5s';
+                    setTimeout(() => {
+                        quizContainer.style.animation = 'fadeIn 0.5s';
+                        loadQuestion();
+                    }, 500);
+                };
+                answersContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const question = questions[currentQuestion];
+
+            if (selected === question.correct) {
+                score++;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion >= questions.length) {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            scoreElement.textContent = `${score} / ${questions.length}`;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            resultsContainer.style.display = 'none';
+            subtitle.style.display = 'block';
+            startQuizButton.style.display = 'block';
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        startQuizButton.addEventListener('click', startQuiz);
+        restartQuizButton.addEventListener('click', restartQuiz);
+    </script>
+</body>
+</html>
